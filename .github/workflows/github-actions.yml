@@ -1,5 +1,5 @@
 name: simple api example CI
-on: [push, pull_request]
+on: [push]
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -9,4 +9,7 @@ jobs:
         with:
           go-version: "1.16"
       - run: go mod tidy
+      - run: echo GIN_MODE=debug >> .env |
+             echo IDENTITY_KEY=test-identity-key >> .env |
+             echo AUTH_SECRET_KEY=test-auth-secret-key >> .env
       - run: go test ./test

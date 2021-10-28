@@ -1,6 +1,8 @@
 package models
 
-import "simple-api-example/database"
+import (
+	"simple-api-example/database"
+)
 
 type Locker struct {
 	ID       int    `json:"ID" gorm:"column:ID;primaryKey;autoIncrement;notNull;"`
@@ -19,8 +21,8 @@ func (Locker) TableName() string {
 
 // CreateLockers : 조회 요청자 소유의 로커들 삽입
 func (lockers *Lockers) Create(userID int) error {
-	for _, locker := range *lockers {
-		locker.Owner = userID
+	for i := range *lockers {
+		(*lockers)[i].Owner = userID
 	}
 	result := database.DB.Model(lockers).
 		Select("Location", "Owner").

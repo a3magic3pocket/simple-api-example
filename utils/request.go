@@ -7,13 +7,14 @@ import (
 	"fmt"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"strings"
 )
 
 // TestRequest : 테스트 요청
-func TestRequest(baseURL string, method string, data map[string]string, headers map[string]string, cookies []*http.Cookie) (statusCode int, body []byte, err error) {
+func TestRequest(baseURL string, method string, data interface{}, headers map[string]string, cookies []*http.Cookie) (statusCode int, body []byte, err error) {
 	// Check method is valid
 	method = strings.ToUpper(method)
 	switch method {
@@ -50,7 +51,11 @@ func TestRequest(baseURL string, method string, data map[string]string, headers 
 		reqBody = bytes.NewBuffer(marshaled)
 	case *contentType == "application/x-www-form-urlencoded":
 		urlData := url.Values{}
-		for key, value := range data {
+		v, ok := data.(map[string]string)
+		if !ok {
+			log.Fatal("type of data of application/x-www-form-urlencoded should be map[string]string")
+		}
+		for key, value := range v {
 			urlData.Set(key, value)
 		}
 		reqBody = strings.NewReader(urlData.Encode())

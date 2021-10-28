@@ -298,3 +298,136 @@ func TestUpdateLocker(t *testing.T) {
 	}
 	assert.Equal(t, succMsg, "success")
 }
+
+func TestDeleteLockers(t *testing.T) {
+	TI.Reset()
+	setLockersMock()
+	// 정상 요청
+	url := TI.Server.URL + "/lockers"
+	method := "DELETE"
+
+	data := []models.Locker{
+		{ID: 1},
+	}
+	headers := map[string]string{
+		"Authorization": "Bearer " + TI.Bearers["normal1"],
+		"Content-Type":  "Application/json",
+	}
+
+	statusCode, body, err := utils.TestRequest(
+		url, method, data, headers, nil,
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	assert.Equal(t, statusCode, 200)
+
+	// 요청 결과 확인
+	succResp := controllers.SuccessResponse{}
+	if err := json.Unmarshal(body, &succResp); err != nil {
+		log.Fatal(err)
+	}
+
+	succMsg := ""
+	if err := json.Unmarshal(succResp.Data, &succMsg); err != nil {
+		log.Fatal(err)
+	}
+	assert.Equal(t, succMsg, "success")
+
+	// 삭제 여부 확인
+	url = TI.Server.URL + "/locker/1"
+	method = "GET"
+
+	emptyData := map[string]string{}
+	headers = map[string]string{
+		"Authorization": "Bearer " + TI.Bearers["normal1"],
+		"Content-Type":  "Application/json",
+	}
+
+	statusCode, body, err = utils.TestRequest(
+		url, method, emptyData, headers, nil,
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	assert.Equal(t, statusCode, 404)
+
+	// 요청 결과 확인
+	failResp := controllers.FailResponse{}
+	if err := json.Unmarshal(body, &failResp); err != nil {
+		log.Fatal(err)
+	}
+
+	errMsg := ""
+	if err := json.Unmarshal(failResp.Error, &errMsg); err != nil {
+		log.Fatal(err)
+	}
+
+	assert.NotEqual(t, errMsg, "")
+
+	// 없는 ID를 포함하여 삭제
+	TI.Reset()
+	setLockersMock()
+	url = TI.Server.URL + "/lockers"
+	method = "DELETE"
+
+	data = []models.Locker{
+		{ID: 1},
+		{ID: 999},
+	}
+	headers = map[string]string{
+		"Authorization": "Bearer " + TI.Bearers["normal1"],
+		"Content-Type":  "Application/json",
+	}
+
+	statusCode, body, err = utils.TestRequest(
+		url, method, data, headers, nil,
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	assert.Equal(t, statusCode, 200)
+
+	// 요청 결과 확인
+	succResp = controllers.SuccessResponse{}
+	if err := json.Unmarshal(body, &succResp); err != nil {
+		log.Fatal(err)
+	}
+
+	succMsg = ""
+	if err := json.Unmarshal(succResp.Data, &succMsg); err != nil {
+		log.Fatal(err)
+	}
+	assert.Equal(t, succMsg, "success")
+
+	// 삭제 여부 확인
+	url = TI.Server.URL + "/locker/1"
+	method = "GET"
+
+	emptyData = map[string]string{}
+	headers = map[string]string{
+		"Authorization": "Bearer " + TI.Bearers["normal1"],
+		"Content-Type":  "Application/json",
+	}
+
+	statusCode, body, err = utils.TestRequest(
+		url, method, emptyData, headers, nil,
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	assert.Equal(t, statusCode, 404)
+
+	// 요청 결과 확인
+	failResp = controllers.FailResponse{}
+	if err := json.Unmarshal(body, &failResp); err != nil {
+		log.Fatal(err)
+	}
+
+	errMsg = ""
+	if err := json.Unmarshal(failResp.Error, &errMsg); err != nil {
+		log.Fatal(err)
+	}
+
+	assert.NotEqual(t, errMsg, "")
+}

@@ -20,7 +20,6 @@ type UserInput struct {
 func CreateUser(c *gin.Context) {
 	userInput := UserInput{}
 	if err := c.ShouldBindJSON(&userInput); err != nil {
-		fmt.Println("err.Error()", err.Error())
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "data is invalid"})
 		return
 	}
@@ -32,13 +31,13 @@ func CreateUser(c *gin.Context) {
 		return
 	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
 		fmt.Println("err", err.Error())
-		c.JSON(http.StatusInternalServerError, gin.H{"errors": "DB error occured"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error occured"})
 		return
 	}
 
 	err = userInput.User.Create()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"errors": "DB error occured"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error occured"})
 		return
 	}
 

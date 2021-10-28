@@ -63,6 +63,39 @@ func UpdateLocker(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": "success"})
 }
 
+// DeleteLockers : Lockers 삭제(soft delete)
+func DeleteLockers(c *gin.Context) {
+	lockers := models.Lockers{}
+	if err := c.ShouldBindJSON(&lockers); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "data is invalid"})
+		return
+	}
+
+	userID, err := auth.GetUserID(c)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	// locker ID 유효성 검사
+	lockerIDs := []int{}
+	for _, locker := range lockers {
+		if locker.ID == 0 {
+			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "ID is empty"})
+			return
+		}
+		lockerIDs = append(lockerIDs, locker.ID)
+	}
+
+	err = lockers.DeleteLockers(userID, lockerIDs)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error occured"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": "success"})
+}
+
 // RetreiveLocker : Locker 조회
 func RetreiveLocker(c *gin.Context) {
 	rawLockerID := c.Param("id")

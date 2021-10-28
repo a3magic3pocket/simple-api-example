@@ -8,7 +8,7 @@ type Locker struct {
 	ID       int    `json:"ID" gorm:"column:ID;primaryKey;autoIncrement;notNull;"`
 	Location string `json:"Location" gorm:"column:Location;"`
 	Owner    int    `json:"Owner" gorm:"column:Owner;"`
-	Status   string `json:"Status" gorm:"column:Status;"`
+	Status   string `json:"Status" gorm:"column:Status;default:normal"`
 }
 
 type Lockers []Locker
@@ -34,7 +34,9 @@ func (lockers *Lockers) Create(userID int) error {
 // UpdateLockers : 조회 요청자 소유의 로커 수정
 func (locker *Locker) PartialUpdate(userID int, lockerID int) error {
 	result := database.DB.Model(locker).
-		Where(`Owner = ? AND ID = ?`, userID, lockerID).
+		Where(`Owner = ?`, userID).
+		Where(`ID = ?`, lockerID).
+		Where(`Status = "normal"`).
 		Select("Location").
 		Updates(locker)
 
@@ -44,7 +46,9 @@ func (locker *Locker) PartialUpdate(userID int, lockerID int) error {
 // GetOwnedLocker : 조회 요청자 소유의 로커 조회
 func (locker *Locker) GetOwned(userID int, lockerID int) error {
 	result := database.DB.
-		Where(`Owner = ? AND ID = ?`, userID, lockerID).
+		Where(`Owner = ?`, userID).
+		Where(`ID = ?`, lockerID).
+		Where(`Status = "normal"`).
 		Take(locker)
 
 	return result.Error
@@ -54,6 +58,7 @@ func (locker *Locker) GetOwned(userID int, lockerID int) error {
 func (lockers *Lockers) GetOwned(userID int) error {
 	result := database.DB.
 		Where(`Owner = ?`, userID).
+		Where(`Status = "normal"`).
 		Find(lockers)
 
 	return result.Error
@@ -63,6 +68,18 @@ func (lockers *Lockers) GetOwned(userID int) error {
 func (lockers *Lockers) GetAll() error {
 	result := database.DB.
 		Find(lockers)
+
+	return result.Error
+}
+
+// DeleteLocker : 모든 로커들 삭제(soft delete)
+func (lockers *Lockers) DeleteLockers(userID int, lockerIDs []int) error {
+	result := database.DB.Model(Locker{}).
+		Where(`Owner = ? `, userID).
+		Where(`ID IN ?`, lockerIDs).
+		Where(`Status = "normal"`).
+		Select("Status").
+		Updates(Locker{Status: "deleted"})
 
 	return result.Error
 }

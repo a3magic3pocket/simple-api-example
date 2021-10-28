@@ -36,6 +36,7 @@ func SetupRouter() *gin.Engine {
 		lockers.GET("", controllers.RetreiveLockers)
 		lockers.GET("all", controllers.RetreiveAllLocker)
 		lockers.POST("", controllers.CreateLockers)
+		lockers.DELETE("", controllers.DeleteLockers)
 	}
 
 	locker := router.Group("/locker")

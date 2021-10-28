@@ -27,7 +27,7 @@ func CreateLockers(c *gin.Context) {
 
 	err = lockers.Create(userID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"errors": "DB error occured"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error occured"})
 		return
 	}
 
@@ -42,6 +42,12 @@ func UpdateLocker(c *gin.Context) {
 		return
 	}
 
+	// locker ID 유효성 검사
+	if locker.ID == 0 {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "ID is empty"})
+		return
+	}
+
 	userID, err := auth.GetUserID(c)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
@@ -50,7 +56,7 @@ func UpdateLocker(c *gin.Context) {
 
 	err = locker.PartialUpdate(userID, locker.ID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"errors": "DB error occured"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error occured"})
 		return
 	}
 
@@ -76,9 +82,9 @@ func RetreiveLocker(c *gin.Context) {
 	err = locker.GetOwned(userID, lockerID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
-			c.JSON(http.StatusUnprocessableEntity, gin.H{"errors": "locker is not exists"})
+			c.JSON(http.StatusNotFound, gin.H{"error": "locker is not exists"})
 		} else {
-			c.JSON(http.StatusInternalServerError, gin.H{"errors": "DB error occured"})
+			c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error occured"})
 		}
 		return
 	}
@@ -97,7 +103,7 @@ func RetreiveLockers(c *gin.Context) {
 	lockers := models.Lockers{}
 	err = lockers.GetOwned(userID)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"errors": "DB error occured"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error occured"})
 		return
 	}
 
@@ -109,7 +115,7 @@ func RetreiveAllLocker(c *gin.Context) {
 	lockers := models.Lockers{}
 	err := lockers.GetAll()
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"errors": "DB error occured"})
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error occured"})
 		return
 	}
 

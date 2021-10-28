@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"simple-api-example/controllers"
+	"simple-api-example/models"
 	"simple-api-example/utils"
 	"testing"
 
@@ -22,8 +23,7 @@ func TestCreateUser(t *testing.T) {
 		"Group":    "normal",
 	}
 	headers := map[string]string{
-		"Authorization": "Bearer " + TI.Bearers["normal1"],
-		"Content-Type":  "Application/json",
+		"Content-Type": "Application/json",
 	}
 	statusCode, body, err := utils.TestRequest(
 		url, method, data, headers, nil,
@@ -45,4 +45,14 @@ func TestCreateUser(t *testing.T) {
 	}
 
 	assert.Equal(t, succMsg, "success")
+
+	// 새로 등록한 유저가 있는지 확인
+	tmpUser := models.User{}
+	err = tmpUser.Get("new_normal")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	assert.Equal(t, tmpUser.Name, "new_normal")
+
 }

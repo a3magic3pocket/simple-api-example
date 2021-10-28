@@ -12,7 +12,7 @@ import (
 
 // UserInput : 유저 인풋 구조체
 type UserInput struct {
-	User     models.User
+	models.User
 	Password string `json:"Password"`
 }
 

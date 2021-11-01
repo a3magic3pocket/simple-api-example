@@ -2,9 +2,9 @@ package controllers
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"simple-api-example/models"
+	"simple-api-example/utils"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -30,10 +30,16 @@ func CreateUser(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "username is duplicated"})
 		return
 	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
-		fmt.Println("err", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error occured"})
 		return
 	}
+
+	hash, err := utils.HashAndSalt(userInput.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Password too short."})
+		return
+	}
+	userInput.User.SecretKey = hash
 
 	err = userInput.User.Create()
 	if err != nil {

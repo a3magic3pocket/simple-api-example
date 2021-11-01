@@ -18,7 +18,7 @@ func TestCreateUser(t *testing.T) {
 
 	// 정상 요청
 	data := map[string]string{
-		"Name":     "new_normal",
+		"UserName": "new_normal",
 		"Password": "new_password1",
 		"Group":    "normal",
 	}

@@ -7,7 +7,7 @@ import (
 // User : 유저
 type User struct {
 	ID        int    `json:"ID" gorm:"column:ID;primaryKey;autoIncrement;notNull;"`
-	Name      string `json:"Name" gorm:"column:Name;unique;"`
+	Name      string `json:"UserName" gorm:"column:Name;unique;"`
 	SecretKey string `json:"SecretKey" gorm:"column:SecretKey;"`
 	Group     string `json:"Group" gorm:"column:Group;"`
 }
@@ -37,6 +37,9 @@ func (users Users) Create() error {
 // Get : userName으로 유저 조회
 func (user *User) Get(userName string) error {
 	result := database.DB.Where(`Name = ?`, userName).Take(user)
+
+	a := []User{}
+	database.DB.Raw("SELECT * FROM USER;").Scan(&a)
 
 	return result.Error
 }

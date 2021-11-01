@@ -17,6 +17,8 @@ type UserInfo struct {
 
 // GetUserInfoFromBody : 요청 body에서 이용하여 유저정보 획득
 func GetUserInfoFromBody(c *gin.Context) (user models.User, err error) {
+	user = models.User{}
+
 	userInfo := UserInfo{}
 	if err = c.ShouldBindJSON(&userInfo); err != nil {
 		return user, errors.New("auth info is invalid")
@@ -26,6 +28,7 @@ func GetUserInfoFromBody(c *gin.Context) (user models.User, err error) {
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return user, errors.New("your account infomation not exists. you need to sign up")
 	}
+
 	if err = utils.ComparePasswords(user.SecretKey, userInfo.Password); err != nil {
 		return user, err
 	}

@@ -115,7 +115,7 @@ func (ti *TestInfo) setBearers() {
 			"Authorization": "Basic " + encoded,
 			"Content-Type":  "Application/json",
 		}
-		statusCode, body, err := utils.TestRequest(ti.Server.URL+"/login", "POST", map[string]string{}, headers, nil)
+		statusCode, body, err := utils.TestRequest(ti.Server.URL+"/login/basic", "POST", map[string]string{}, headers, nil)
 		if err != nil {
 			log.Fatal(err)
 		}

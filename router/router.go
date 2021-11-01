@@ -6,12 +6,24 @@ import (
 	"simple-api-example/controllers"
 	"simple-api-example/middleware"
 
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
 // SetupRouter : 라우터 세팅
 func SetupRouter() *gin.Engine {
 	router := gin.Default()
+
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowHeaders = []string{
+		"Authorization",
+		"Content-type",
+	}
+	corsConfig.AllowOrigins = []string{
+		"http://localhost:3000",
+	}
+	corsConfig.AllowCredentials = true
+	router.Use(cors.New(corsConfig))
 
 	authMiddleware, err := middleware.GetAuthMiddleware()
 	if err != nil {

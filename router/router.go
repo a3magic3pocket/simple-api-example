@@ -19,6 +19,7 @@ func SetupRouter() *gin.Engine {
 	}
 
 	// 인증
+	router.POST("/login/basic", authMiddleware.LoginHandler)
 	router.POST("/login", authMiddleware.LoginHandler)
 	router.POST("/logout", authMiddleware.LogoutHandler)
 	router.NoRoute(func(c *gin.Context) {

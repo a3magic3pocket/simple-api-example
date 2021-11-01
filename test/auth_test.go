@@ -3,12 +3,43 @@ package test
 import (
 	"encoding/json"
 	"log"
+	"simple-api-example/auth"
 	"simple-api-example/controllers"
 	"simple-api-example/utils"
 	"testing"
 
 	"github.com/go-playground/assert/v2"
 )
+
+func TestLoginUsingBody(t *testing.T) {
+	TI.Reset()
+	data := auth.UserInfo{
+		UserName: TI.UserInputs[0].User.Name,
+		Password: TI.UserInputs[0].Password,
+	}
+	headers := map[string]string{
+		"Content-Type": "Application/json",
+	}
+	statusCode, body, err := utils.TestRequest(TI.Server.URL+"/login", "POST", data, headers, nil)
+	if err != nil {
+		log.Fatal(err)
+	}
+	if statusCode != 200 {
+		log.Fatalf("failed to get jwt. body: %s", body)
+	}
+
+	succResp := controllers.SuccessResponse{}
+	err = json.Unmarshal(body, &succResp)
+	if err != nil {
+		log.Fatalln(err)
+	}
+
+	authTokenResp := controllers.AuthTokenResponse{}
+	err = json.Unmarshal(succResp.Data, &authTokenResp)
+	if err != nil {
+		log.Fatalln(err)
+	}
+}
 
 func TestLogout(t *testing.T) {
 	TI.Reset()

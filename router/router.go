@@ -20,6 +20,7 @@ func SetupRouter() *gin.Engine {
 
 	// 인증
 	router.POST("/login/basic", authMiddleware.LoginHandler)
+	router.POST("/login", authMiddleware.LoginHandler)
 	router.POST("/logout", authMiddleware.LogoutHandler)
 	router.NoRoute(func(c *gin.Context) {
 		c.JSON(http.StatusNotFound, gin.H{"error": "Page Not Found"})

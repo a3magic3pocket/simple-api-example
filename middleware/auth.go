@@ -47,7 +47,7 @@ func GetAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 			var err error
 
 			switch c.FullPath() {
-			case "/login":
+			case "/login/basic":
 				user, err = auth.GetUserInfoUsingBasicAuth(c)
 			default:
 				log.Printf("auth c.FullPath is not allowed, c.FullPath: %s", c.FullPath())

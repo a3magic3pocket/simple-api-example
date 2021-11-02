@@ -34,6 +34,16 @@ func (users Users) Create() error {
 	return result.Error
 }
 
+// GetOwned : 유저 ID로 유저 조회
+func (user *User) GetOwned(userID int) error {
+	result := database.DB.
+		Select("Name").
+		Where(`ID = ?`, userID).
+		Take(user)
+
+	return result.Error
+}
+
 // Get : userName으로 유저 조회
 func (user *User) Get(userName string) error {
 	result := database.DB.Where(`Name = ?`, userName).Take(user)

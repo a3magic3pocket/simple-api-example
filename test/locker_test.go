@@ -129,7 +129,7 @@ func TestRetrieveLockers(t *testing.T) {
 	assert.Equal(t, exists, true)
 }
 
-func TestRetreiveLocker(t *testing.T) {
+func TestRetrieveLocker(t *testing.T) {
 	TI.Reset()
 	setLockersMock()
 	// 정상 요청

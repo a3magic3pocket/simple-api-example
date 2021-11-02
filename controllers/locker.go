@@ -96,8 +96,8 @@ func DeleteLockers(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": "success"})
 }
 
-// RetreiveLocker : Locker 조회
-func RetreiveLocker(c *gin.Context) {
+// RetrieveLocker : Locker 조회
+func RetrieveLocker(c *gin.Context) {
 	rawLockerID := c.Param("id")
 	lockerID, err := strconv.Atoi(rawLockerID)
 	if err != nil {

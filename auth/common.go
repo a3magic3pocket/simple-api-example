@@ -5,20 +5,30 @@ import (
 	"os"
 	"simple-api-example/models"
 	"simple-api-example/utils"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
 type UserInfo struct {
-	UserName string `json:"UserName"`
-	Password string `json:"Password"`
+	UserName string `json:"UserName" form:"UserName"`
+	Password string `json:"Password" form:"Password"`
 }
 
 // GetUserInfoFromBody : 요청 body에서 이용하여 유저정보 획득
 func GetUserInfoFromBody(c *gin.Context) (user models.User, err error) {
+	user = models.User{}
+
 	userInfo := UserInfo{}
-	if err = c.ShouldBindJSON(&userInfo); err != nil {
+
+	contentType := c.Request.Header["Content-Type"]
+	if len(contentType) > 0 && strings.ToLower(contentType[0]) == "application/json" {
+		err = c.ShouldBindJSON(&userInfo)
+	} else {
+		err = c.ShouldBind(&userInfo)
+	}
+	if err != nil {
 		return user, errors.New("auth info is invalid")
 	}
 
@@ -26,6 +36,7 @@ func GetUserInfoFromBody(c *gin.Context) (user models.User, err error) {
 	if errors.Is(err, gorm.ErrRecordNotFound) {
 		return user, errors.New("your account infomation not exists. you need to sign up")
 	}
+
 	if err = utils.ComparePasswords(user.SecretKey, userInfo.Password); err != nil {
 		return user, err
 	}

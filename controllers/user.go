@@ -49,3 +49,7 @@ func CreateUser(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"data": "success"})
 }
+
+//  RetreiveUser : 유저 조회
+func RetreiveUser(c *gin.Context) {
+}

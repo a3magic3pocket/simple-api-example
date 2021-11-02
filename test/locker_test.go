@@ -85,7 +85,7 @@ func TestCreateLockers(t *testing.T) {
 	assert.Equal(t, succMsg, "success")
 }
 
-func TestRetreiveLockers(t *testing.T) {
+func TestRetrieveLockers(t *testing.T) {
 	TI.Reset()
 	setLockersMock()
 	url := TI.Server.URL + "/lockers"

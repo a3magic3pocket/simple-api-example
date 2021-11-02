@@ -63,8 +63,8 @@ func SetupRouter() *gin.Engine {
 	lockers := router.Group("/lockers")
 	lockers.Use(authMiddleware.MiddlewareFunc())
 	{
-		lockers.GET("", controllers.RetreiveLockers)
-		lockers.GET("all", controllers.RetreiveAllLocker)
+		lockers.GET("", controllers.RetrieveLockers)
+		lockers.GET("all", controllers.RetrieveAllLocker)
 		lockers.POST("", controllers.CreateLockers)
 		lockers.DELETE("", controllers.DeleteLockers)
 	}

@@ -125,8 +125,8 @@ func RetreiveLocker(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": locker})
 }
 
-// RetreiveLockers : Lockers 조회
-func RetreiveLockers(c *gin.Context) {
+// RetrieveLockers : Lockers 조회
+func RetrieveLockers(c *gin.Context) {
 	userID, err := auth.GetUserID(c)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
@@ -144,7 +144,7 @@ func RetreiveLockers(c *gin.Context) {
 }
 
 // RetrieveAllLockers : 모든 Lockers 조회
-func RetreiveAllLocker(c *gin.Context) {
+func RetrieveAllLocker(c *gin.Context) {
 	lockers := models.Lockers{}
 	err := lockers.GetAll()
 	if err != nil {

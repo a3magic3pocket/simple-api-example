@@ -32,10 +32,9 @@ func (lockers *Lockers) Create(userID int) error {
 }
 
 // UpdateLockers : 조회 요청자 소유의 로커 수정
-func (locker *Locker) PartialUpdate(userID int, lockerID int) error {
+func (locker *Locker) PartialUpdate(userID int) error {
 	result := database.DB.Model(locker).
 		Where(`Owner = ?`, userID).
-		Where(`ID = ?`, lockerID).
 		Where(`Status = "normal"`).
 		Select("Location").
 		Updates(locker)
@@ -73,10 +72,9 @@ func (lockers *Lockers) GetAll() error {
 }
 
 // DeleteLocker : 모든 로커들 삭제(soft delete)
-func (lockers *Lockers) DeleteLockers(userID int, lockerIDs []int) error {
-	result := database.DB.Model(Locker{}).
+func (lockers *Lockers) DeleteLockers(userID int) error {
+	result := database.DB.Model(lockers).
 		Where(`Owner = ? `, userID).
-		Where(`ID IN ?`, lockerIDs).
 		Where(`Status = "normal"`).
 		Select("Status").
 		Updates(Locker{Status: "deleted"})

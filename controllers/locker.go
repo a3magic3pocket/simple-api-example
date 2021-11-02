@@ -11,6 +11,12 @@ import (
 	"gorm.io/gorm"
 )
 
+// LockerOutput : Locker 아웃풋 구조체
+type LockerOutput struct {
+	ID       int    `json:"ID"`
+	Location string `json:"Location"`
+}
+
 // CreateLockers : Lockers 생성
 func CreateLockers(c *gin.Context) {
 	lockers := models.Lockers{}
@@ -54,7 +60,7 @@ func UpdateLocker(c *gin.Context) {
 		return
 	}
 
-	err = locker.PartialUpdate(userID, locker.ID)
+	err = locker.PartialUpdate(userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error occured"})
 		return
@@ -62,6 +68,37 @@ func UpdateLocker(c *gin.Context) {
 
 	c.JSON(http.StatusOK, gin.H{"data": "success"})
 }
+
+// // UpdateLockers : Lockers를 한 값으로 업데이트
+// func UpdateLockers(c *gin.Context) {
+// 	lockers := models.Lockers{}
+// 	if err := c.ShouldBindJSON(&lockers); err != nil {
+// 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "data is invalid"})
+// 		return
+// 	}
+
+// 	// locker ID 유효성 검사
+// 	for _, locker := range lockers {
+// 		if locker.ID == 0 {
+// 			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "ID is empty"})
+// 			return
+// 		}
+// 	}
+
+// 	userID, err := auth.GetUserID(c)
+// 	if err != nil {
+// 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+// 		return
+// 	}
+
+// 	err = locker.PartialUpdate(userID, locker.ID)
+// 	if err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error occured"})
+// 		return
+// 	}
+
+// 	c.JSON(http.StatusOK, gin.H{"data": "success"})
+// }
 
 // DeleteLockers : Lockers 삭제(soft delete)
 func DeleteLockers(c *gin.Context) {
@@ -78,16 +115,14 @@ func DeleteLockers(c *gin.Context) {
 	}
 
 	// locker ID 유효성 검사
-	lockerIDs := []int{}
 	for _, locker := range lockers {
 		if locker.ID == 0 {
 			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "ID is empty"})
 			return
 		}
-		lockerIDs = append(lockerIDs, locker.ID)
 	}
 
-	err = lockers.DeleteLockers(userID, lockerIDs)
+	err = lockers.DeleteLockers(userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error occured"})
 		return
@@ -122,7 +157,11 @@ func RetrieveLocker(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": locker})
+	lockerOuput := LockerOutput{}
+	lockerOuput.ID = locker.ID
+	lockerOuput.Location = locker.Location
+
+	c.JSON(http.StatusOK, gin.H{"data": lockerOuput})
 }
 
 // RetrieveLockers : Lockers 조회
@@ -140,7 +179,15 @@ func RetrieveLockers(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": lockers})
+	lockerOuputs := []LockerOutput{}
+	for _, locker := range lockers {
+		lockerOuput := LockerOutput{}
+		lockerOuput.ID = locker.ID
+		lockerOuput.Location = locker.Location
+		lockerOuputs = append(lockerOuputs, lockerOuput)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": lockerOuputs})
 }
 
 // RetrieveAllLockers : 모든 Lockers 조회
@@ -152,5 +199,13 @@ func RetrieveAllLocker(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": lockers})
+	lockerOuputs := []LockerOutput{}
+	for _, locker := range lockers {
+		lockerOuput := LockerOutput{}
+		lockerOuput.ID = locker.ID
+		lockerOuput.Location = locker.Location
+		lockerOuputs = append(lockerOuputs, lockerOuput)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": lockerOuputs})
 }

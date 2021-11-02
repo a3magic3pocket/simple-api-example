@@ -42,6 +42,17 @@ func (locker *Locker) PartialUpdate(userID int) error {
 	return result.Error
 }
 
+// UpdateLockers : 조회 요청자 소유의 로커 수정
+func (lockers *Lockers) PartialUpdate(userID int, updateLocker Locker) error {
+	result := database.DB.Model(lockers).
+		Where(`Owner = ?`, userID).
+		Where(`Status = "normal"`).
+		Select("Location").
+		Updates(updateLocker)
+
+	return result.Error
+}
+
 // GetOwnedLocker : 조회 요청자 소유의 로커 조회
 func (locker *Locker) GetOwned(userID int, lockerID int) error {
 	result := database.DB.

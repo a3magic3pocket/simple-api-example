@@ -17,6 +17,12 @@ type LockerOutput struct {
 	Location string `json:"Location"`
 }
 
+// UpdateLockersInput : UpdateLockers 인풋 구조체
+type UpdateLockersInput struct {
+	models.Locker
+	UpdateIDs []int `json:"UpdateIDs"`
+}
+
 // CreateLockers : Lockers 생성
 func CreateLockers(c *gin.Context) {
 	lockers := models.Lockers{}
@@ -69,36 +75,41 @@ func UpdateLocker(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": "success"})
 }
 
-// // UpdateLockers : Lockers를 한 값으로 업데이트
-// func UpdateLockers(c *gin.Context) {
-// 	lockers := models.Lockers{}
-// 	if err := c.ShouldBindJSON(&lockers); err != nil {
-// 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "data is invalid"})
-// 		return
-// 	}
+// UpdateLockers : Lockers를 한 값으로 업데이트
+func UpdateLockers(c *gin.Context) {
+	updateLockersInput := UpdateLockersInput{}
+	if err := c.ShouldBindJSON(&updateLockersInput); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "data is invalid"})
+		return
+	}
 
-// 	// locker ID 유효성 검사
-// 	for _, locker := range lockers {
-// 		if locker.ID == 0 {
-// 			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "ID is empty"})
-// 			return
-// 		}
-// 	}
+	// locker ID 유효성 검사
+	nonZeroLockers := models.Lockers{}
+	for _, id := range updateLockersInput.UpdateIDs {
+		if id != 0 {
+			nonZeroLockers = append(nonZeroLockers, models.Locker{ID: id})
+		}
+	}
 
-// 	userID, err := auth.GetUserID(c)
-// 	if err != nil {
-// 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
-// 		return
-// 	}
+	if len(nonZeroLockers) == 0 {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "all of UpdateIDs are empty"})
+		return
+	}
 
-// 	err = locker.PartialUpdate(userID, locker.ID)
-// 	if err != nil {
-// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error occured"})
-// 		return
-// 	}
+	userID, err := auth.GetUserID(c)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
 
-// 	c.JSON(http.StatusOK, gin.H{"data": "success"})
-// }
+	err = nonZeroLockers.PartialUpdate(userID, updateLockersInput.Locker)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error occured"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": "success"})
+}
 
 // DeleteLockers : Lockers 삭제(soft delete)
 func DeleteLockers(c *gin.Context) {

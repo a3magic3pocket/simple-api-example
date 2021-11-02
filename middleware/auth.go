@@ -82,6 +82,11 @@ func GetAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 			})
 		},
 		LoginResponse: func(c *gin.Context, code int, token string, expire time.Time) {
+			redirectURL := c.Query("redirect-url")
+			if c.FullPath() == "/login" && redirectURL != "" {
+				c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000")
+				return
+			}
 			statusCode := http.StatusOK
 			c.JSON(http.StatusOK, gin.H{
 				"data": gin.H{

@@ -3,6 +3,7 @@ package controllers
 import (
 	"errors"
 	"net/http"
+	"simple-api-example/auth"
 	"simple-api-example/models"
 	"simple-api-example/utils"
 
@@ -14,6 +15,11 @@ import (
 type UserInput struct {
 	models.User
 	Password string `json:"Password"`
+}
+
+// UserOutput : 유저 아웃풋 구조체
+type UserOutput struct {
+	UserName string `json:"UserName"`
 }
 
 // CreateUser : 유저 생성
@@ -50,6 +56,23 @@ func CreateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": "success"})
 }
 
-//  RetreiveUser : 유저 조회
-func RetreiveUser(c *gin.Context) {
+//  RetrieveUser : 유저 조회
+func RetrieveUser(c *gin.Context) {
+	userID, err := auth.GetUserID(c)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	user := models.User{}
+	err = user.GetOwned(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error occured"})
+		return
+	}
+
+	userOutput := UserOutput{}
+	userOutput.UserName = user.Name
+
+	c.JSON(http.StatusOK, gin.H{"data": userOutput})
 }

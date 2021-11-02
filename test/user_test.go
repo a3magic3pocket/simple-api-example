@@ -54,5 +54,37 @@ func TestCreateUser(t *testing.T) {
 	}
 
 	assert.Equal(t, tmpUser.Name, "new_normal")
+}
 
+func TestRetrieveUser(t *testing.T) {
+	TI.Reset()
+	url := TI.Server.URL + "/user"
+	method := "GET"
+
+	// 정상 요청
+	data := map[string]string{}
+	headers := map[string]string{
+		"Authorization": "Bearer " + TI.Bearers["normal1"],
+		"Content-Type":  "Application/json",
+	}
+	statusCode, body, err := utils.TestRequest(
+		url, method, data, headers, nil,
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	assert.Equal(t, statusCode, 200)
+
+	// 요청 결과 확인
+	succResp := controllers.SuccessResponse{}
+	if err := json.Unmarshal(body, &succResp); err != nil {
+		log.Fatal(err)
+	}
+
+	userOutput := controllers.UserOutput{}
+	if err := json.Unmarshal(succResp.Data, &userOutput); err != nil {
+		log.Fatal(err)
+	}
+
+	assert.Equal(t, TI.UserInputs[0].Name, userOutput.UserName)
 }

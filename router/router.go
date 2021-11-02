@@ -58,6 +58,10 @@ func SetupRouter() *gin.Engine {
 	// 유저
 	user := router.Group("/user")
 	user.POST("", controllers.CreateUser)
+	user.Use(authMiddleware.MiddlewareFunc())
+	{
+		user.GET("", controllers.RetrieveUser)
+	}
 
 	// 로커
 	lockers := router.Group("/lockers")
@@ -72,7 +76,7 @@ func SetupRouter() *gin.Engine {
 	locker := router.Group("/locker")
 	locker.Use(authMiddleware.MiddlewareFunc())
 	{
-		locker.GET(":id", controllers.RetreiveLocker)
+		locker.GET(":id", controllers.RetrieveLocker)
 		locker.PATCH("", controllers.UpdateLocker)
 	}
 

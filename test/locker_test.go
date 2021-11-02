@@ -299,6 +299,109 @@ func TestUpdateLocker(t *testing.T) {
 	assert.Equal(t, succMsg, "success")
 }
 
+func TestUpdateLockers(t *testing.T) {
+	TI.Reset()
+	setLockersMock()
+	// 정상 요청
+	url := TI.Server.URL + "/lockers"
+	method := "PATCH"
+
+	data := controllers.UpdateLockersInput{
+		Locker: models.Locker{ID: 1, Location: "Z"}, UpdateIDs: []int{1, 2, 3},
+	}
+	headers := map[string]string{
+		"Authorization": "Bearer " + TI.Bearers["normal1"],
+		"Content-Type":  "Application/json",
+	}
+
+	statusCode, body, err := utils.TestRequest(
+		url, method, data, headers, nil,
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	assert.Equal(t, statusCode, 200)
+
+	// 요청 결과 확인
+	succResp := controllers.SuccessResponse{}
+	if err := json.Unmarshal(body, &succResp); err != nil {
+		log.Fatal(err)
+	}
+
+	succMsg := ""
+	if err := json.Unmarshal(succResp.Data, &succMsg); err != nil {
+		log.Fatal(err)
+	}
+	assert.Equal(t, succMsg, "success")
+
+	// locker 1, 2, 3의 location 값이 변경되었는지 확인
+	url = TI.Server.URL + "/lockers"
+	method = "GET"
+
+	emptyData := map[string]string{}
+	headers = map[string]string{
+		"Authorization": "Bearer " + TI.Bearers["normal1"],
+		"Content-Type":  "Application/json",
+	}
+
+	statusCode, body, err = utils.TestRequest(
+		url, method, emptyData, headers, nil,
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	assert.Equal(t, statusCode, 200)
+
+	// 요청 결과 확인
+	succResp = controllers.SuccessResponse{}
+	if err := json.Unmarshal(body, &succResp); err != nil {
+		log.Fatal(err)
+	}
+
+	lockers := models.Lockers{}
+	if err := json.Unmarshal(succResp.Data, &lockers); err != nil {
+		log.Fatal(err)
+	}
+
+	for _, locker := range lockers {
+		if locker.ID == 1 || locker.ID == 2 || locker.ID == 3 {
+			assert.Equal(t, locker.Location, "Z")
+		}
+	}
+
+	// 없는 ID 갱신 시도
+	url = TI.Server.URL + "/locker"
+	method = "PATCH"
+
+	data = controllers.UpdateLockersInput{
+		Locker: models.Locker{ID: 1, Location: "TTT"}, UpdateIDs: []int{99, 999, 9999},
+	}
+	headers = map[string]string{
+		"Authorization": "Bearer " + TI.Bearers["normal1"],
+		"Content-Type":  "Application/json",
+	}
+
+	statusCode, body, err = utils.TestRequest(
+		url, method, data, headers, nil,
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	assert.Equal(t, statusCode, 200)
+
+	// 요청 결과 확인
+	failResp := controllers.SuccessResponse{}
+	if err := json.Unmarshal(body, &failResp); err != nil {
+		log.Fatal(err)
+	}
+
+	succMsg = ""
+	if err := json.Unmarshal(failResp.Data, &succMsg); err != nil {
+		log.Fatal(err)
+	}
+	assert.Equal(t, succMsg, "success")
+}
+
 func TestDeleteLockers(t *testing.T) {
 	TI.Reset()
 	setLockersMock()

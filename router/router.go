@@ -26,6 +26,9 @@ func SetupRouter() *gin.Engine {
 		"http://localhost:3000",
 	}
 	corsConfig.AllowCredentials = true
+	corsConfig.AllowMethods = []string{
+		"GET", "POST", "DELETE", "PATCH",
+	}
 	router.Use(cors.New(corsConfig))
 
 	authMiddleware, err := middleware.GetAuthMiddleware()

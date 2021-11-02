@@ -11,6 +11,18 @@ import (
 	"gorm.io/gorm"
 )
 
+// LockerOutput : Locker 아웃풋 구조체
+type LockerOutput struct {
+	ID       int    `json:"ID"`
+	Location string `json:"Location"`
+}
+
+// UpdateLockersInput : UpdateLockers 인풋 구조체
+type UpdateLockersInput struct {
+	models.Locker
+	UpdateIDs []int `json:"UpdateIDs"`
+}
+
 // CreateLockers : Lockers 생성
 func CreateLockers(c *gin.Context) {
 	lockers := models.Lockers{}
@@ -54,7 +66,43 @@ func UpdateLocker(c *gin.Context) {
 		return
 	}
 
-	err = locker.PartialUpdate(userID, locker.ID)
+	err = locker.PartialUpdate(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error occured"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": "success"})
+}
+
+// UpdateLockers : Lockers를 한 값으로 업데이트
+func UpdateLockers(c *gin.Context) {
+	updateLockersInput := UpdateLockersInput{}
+	if err := c.ShouldBindJSON(&updateLockersInput); err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "data is invalid"})
+		return
+	}
+
+	// locker ID 유효성 검사
+	nonZeroLockers := models.Lockers{}
+	for _, id := range updateLockersInput.UpdateIDs {
+		if id != 0 {
+			nonZeroLockers = append(nonZeroLockers, models.Locker{ID: id})
+		}
+	}
+
+	if len(nonZeroLockers) == 0 {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "all of UpdateIDs are empty"})
+		return
+	}
+
+	userID, err := auth.GetUserID(c)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	err = nonZeroLockers.PartialUpdate(userID, updateLockersInput.Locker)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error occured"})
 		return
@@ -78,16 +126,14 @@ func DeleteLockers(c *gin.Context) {
 	}
 
 	// locker ID 유효성 검사
-	lockerIDs := []int{}
 	for _, locker := range lockers {
 		if locker.ID == 0 {
 			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "ID is empty"})
 			return
 		}
-		lockerIDs = append(lockerIDs, locker.ID)
 	}
 
-	err = lockers.DeleteLockers(userID, lockerIDs)
+	err = lockers.DeleteLockers(userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error occured"})
 		return
@@ -96,8 +142,8 @@ func DeleteLockers(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": "success"})
 }
 
-// RetreiveLocker : Locker 조회
-func RetreiveLocker(c *gin.Context) {
+// RetrieveLocker : Locker 조회
+func RetrieveLocker(c *gin.Context) {
 	rawLockerID := c.Param("id")
 	lockerID, err := strconv.Atoi(rawLockerID)
 	if err != nil {
@@ -122,11 +168,15 @@ func RetreiveLocker(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": locker})
+	lockerOuput := LockerOutput{}
+	lockerOuput.ID = locker.ID
+	lockerOuput.Location = locker.Location
+
+	c.JSON(http.StatusOK, gin.H{"data": lockerOuput})
 }
 
-// RetreiveLockers : Lockers 조회
-func RetreiveLockers(c *gin.Context) {
+// RetrieveLockers : Lockers 조회
+func RetrieveLockers(c *gin.Context) {
 	userID, err := auth.GetUserID(c)
 	if err != nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
@@ -140,11 +190,19 @@ func RetreiveLockers(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": lockers})
+	lockerOuputs := []LockerOutput{}
+	for _, locker := range lockers {
+		lockerOuput := LockerOutput{}
+		lockerOuput.ID = locker.ID
+		lockerOuput.Location = locker.Location
+		lockerOuputs = append(lockerOuputs, lockerOuput)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": lockerOuputs})
 }
 
 // RetrieveAllLockers : 모든 Lockers 조회
-func RetreiveAllLocker(c *gin.Context) {
+func RetrieveAllLocker(c *gin.Context) {
 	lockers := models.Lockers{}
 	err := lockers.GetAll()
 	if err != nil {
@@ -152,5 +210,13 @@ func RetreiveAllLocker(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"data": lockers})
+	lockerOuputs := []LockerOutput{}
+	for _, locker := range lockers {
+		lockerOuput := LockerOutput{}
+		lockerOuput.ID = locker.ID
+		lockerOuput.Location = locker.Location
+		lockerOuputs = append(lockerOuputs, lockerOuput)
+	}
+
+	c.JSON(http.StatusOK, gin.H{"data": lockerOuputs})
 }

@@ -23,6 +23,11 @@ func GetAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 		Key:              []byte(os.Getenv("AUTH_SECRET_KEY")),
 		Timeout:          time.Hour * 24,
 		MaxRefresh:       time.Hour * 24,
+		SendCookie:       true,
+		CookieHTTPOnly:   true,
+		SecureCookie:     true,
+		CookieMaxAge:     time.Hour * 24,
+		CookieName:       "simple-locker-auth",
 		IdentityKey:      identityKey,
 		SigningAlgorithm: "HS256",
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
@@ -77,6 +82,11 @@ func GetAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 			})
 		},
 		LoginResponse: func(c *gin.Context, code int, token string, expire time.Time) {
+			redirectURL := c.Query("redirect-url")
+			if c.FullPath() == "/login" && redirectURL != "" {
+				c.Redirect(http.StatusTemporaryRedirect, "http://localhost:3000")
+				return
+			}
 			statusCode := http.StatusOK
 			c.JSON(http.StatusOK, gin.H{
 				"data": gin.H{
@@ -110,7 +120,7 @@ func GetAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 		// TokenLookup: "header: Authorization",
 		// TokenLookup: "query:token",
 		// TokenLookup: "cookie:token",
-		TokenLookup: "header: Authorization",
+		TokenLookup: "header: Authorization, cookie:simple-locker-auth",
 
 		// TokenHeadName is a string in the header. Default value is "Bearer"
 		TokenHeadName: "Bearer",

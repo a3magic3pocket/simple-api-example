@@ -2,9 +2,10 @@ package controllers
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
+	"simple-api-example/auth"
 	"simple-api-example/models"
+	"simple-api-example/utils"
 
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
@@ -14,6 +15,11 @@ import (
 type UserInput struct {
 	models.User
 	Password string `json:"Password"`
+}
+
+// UserOutput : 유저 아웃풋 구조체
+type UserOutput struct {
+	UserName string `json:"UserName"`
 }
 
 // CreateUser : 유저 생성
@@ -30,10 +36,16 @@ func CreateUser(c *gin.Context) {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "username is duplicated"})
 		return
 	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
-		fmt.Println("err", err.Error())
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error occured"})
 		return
 	}
+
+	hash, err := utils.HashAndSalt(userInput.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Password too short."})
+		return
+	}
+	userInput.User.SecretKey = hash
 
 	err = userInput.User.Create()
 	if err != nil {
@@ -42,4 +54,25 @@ func CreateUser(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{"data": "success"})
+}
+
+//  RetrieveUser : 유저 조회
+func RetrieveUser(c *gin.Context) {
+	userID, err := auth.GetUserID(c)
+	if err != nil {
+		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": err.Error()})
+		return
+	}
+
+	user := models.User{}
+	err = user.GetOwned(userID)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error occured"})
+		return
+	}
+
+	userOutput := UserOutput{}
+	userOutput.UserName = user.Name
+
+	c.JSON(http.StatusOK, gin.H{"data": userOutput})
 }

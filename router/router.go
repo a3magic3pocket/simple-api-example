@@ -70,6 +70,7 @@ func SetupRouter() *gin.Engine {
 		lockers.GET("", controllers.RetrieveLockers)
 		lockers.GET("all", controllers.RetrieveAllLocker)
 		lockers.POST("", controllers.CreateLockers)
+		lockers.PATCH("")
 		lockers.DELETE("", controllers.DeleteLockers)
 	}
 

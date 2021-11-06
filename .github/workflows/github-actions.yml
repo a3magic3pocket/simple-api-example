@@ -22,3 +22,6 @@ jobs:
 
       - name: Test
         run: go test ./test
+
+      - name: Image Tag Test
+        run: chmod 775 ./simple-image-checker_linux_amd64 && ./simple-image-checker_linux_amd64 -f simple-api.yml -tu https://registry.hub.docker.com/v1/repositories/a3magic3pocket/simple-web/tags

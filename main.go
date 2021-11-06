@@ -1,15 +1,16 @@
 package main
 
 import (
-	"fmt"
+	"os"
 	"simple-api-example/database"
 	"simple-api-example/router"
 	"simple-api-example/utils"
 )
 
 func main() {
-	fmt.Println("hello world")
-	utils.LoadEnv()
+	if os.Getenv("USE_K8S") == "" {
+		utils.LoadEnv()
+	}
 
 	database.SetDB()
 	// models.CreateAllTablesIfNotExists(database.DB)

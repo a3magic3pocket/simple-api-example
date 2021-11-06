@@ -31,7 +31,7 @@ func SetDB() {
 	switch strings.ToLower(ginMode) {
 	case "debug":
 		DB, err = gorm.Open(sqlite.Open(fmt.Sprintf("%s/debug.db", pvDirPath)), &gorm.Config{})
-	case "operation":
+	case "release":
 		DB, err = gorm.Open(sqlite.Open(fmt.Sprintf("%s/operation.db", pvDirPath)), &gorm.Config{})
 	default:
 		log.Fatalf("gin mode is not allowed. gin mode : %s\n", ginMode)

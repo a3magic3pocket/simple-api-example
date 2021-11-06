@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"os"
 	"path/filepath"
 	"runtime"
 	"simple-api-example/controllers"
@@ -22,8 +23,9 @@ func SetupRouter() *gin.Engine {
 		"Authorization",
 		"Content-type",
 	}
+	fmt.Println("os.Getenv('FRONTEND_URL'),", os.Getenv("FRONTEND_URL"))
 	corsConfig.AllowOrigins = []string{
-		"http://localhost:3000",
+		os.Getenv("FRONTEND_URL"),
 	}
 	corsConfig.AllowCredentials = true
 	corsConfig.AllowMethods = []string{

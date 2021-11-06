@@ -40,6 +40,16 @@ spec:
                 configMapKeyRef:
                   name: simple-api
                   key: ginMode
+            - name: IDENTITY_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: simple-api-secret
+                  key: identityKey
+            - name: AUTH_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: simple-api-secret
+                  key: authSecretKey
 ---
 apiVersion: v1
 kind: Service

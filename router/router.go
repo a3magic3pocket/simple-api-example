@@ -9,6 +9,7 @@ import (
 	"runtime"
 	"simple-api-example/controllers"
 	"simple-api-example/middleware"
+	"strings"
 
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
@@ -23,10 +24,7 @@ func SetupRouter() *gin.Engine {
 		"Authorization",
 		"Content-type",
 	}
-	fmt.Println("os.Getenv('FRONTEND_URL'),", os.Getenv("FRONTEND_URL"))
-	corsConfig.AllowOrigins = []string{
-		os.Getenv("FRONTEND_URL"),
-	}
+	corsConfig.AllowOrigins = strings.Split(os.Getenv("FRONTEND_URL_LIST"), ",")
 	corsConfig.AllowCredentials = true
 	corsConfig.AllowMethods = []string{
 		"GET", "POST", "DELETE", "PATCH",

@@ -30,11 +30,11 @@ spec:
                 configMapKeyRef:
                   name: simple-api
                   key: useK8s
-            - name: FRONTEND_URL
+            - name: FRONTEND_URL_LIST
               valueFrom:
                 configMapKeyRef:
                   name: simple-api
-                  key: frontendUrl
+                  key: frontendUrlList
             - name: GIN_MODE
               valueFrom:
                 configMapKeyRef:

@@ -33,4 +33,4 @@ jobs:
         with:
           context: .
           push: true
-          tags: "a3magic3pocket/simple-api:${TAG}"
+          tags: a3magic3pocket/simple-api:${{ TAG }}

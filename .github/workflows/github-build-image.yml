@@ -1,21 +1,24 @@
 name: Build docker image
-on:
-  pull_request:
-    branches:
-      - main
-    types: [closed]
 # on:
-#   workflow_run:
-#     workflows: ["simple api example CI"]
-#     branches: [main]
-#     types: 
-#       - completed
+#   pull_request:
+#     branches:
+#       - main
+#     types: [closed]
+on:
+  workflow_run:
+    workflows: ["simple api example CI"]
+    branches: [main]
+    types: 
+      - completed
 jobs:
   push_to_registry:
     environment: dockerhub
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
-    if: ${{ github.event.pull_request.merged }}
+    # if: ${{ github.event.pull_request.merged }}
+    if: >
+      ${{ github.event.workflow_run.event == 'pull_request' &&
+      github.event.workflow_run.conclusion == 'success' }}
     steps:
       - name: Check out the repo
         uses: actions/checkout@v2

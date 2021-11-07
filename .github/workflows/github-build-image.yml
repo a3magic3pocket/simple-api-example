@@ -1,10 +1,15 @@
 name: Build docker image
 on:
-  workflow_run:
-    workflows: ["simple api example CI"]
-    branches: [main]
-    types: 
-      - completed
+  pull_request:
+    branches:
+      - main
+    types: [closed]
+# on:
+#   workflow_run:
+#     workflows: ["simple api example CI"]
+#     branches: [main]
+#     types: 
+#       - completed
 jobs:
   push_to_registry:
     environment: dockerhub

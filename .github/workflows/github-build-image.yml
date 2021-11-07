@@ -4,8 +4,15 @@ on:
     branches:
       - main
     types: [closed]
+on:
+  workflow_run:
+    workflows: ["simple api example CI"]
+    branches: [main]
+    types: 
+      - completed
 jobs:
   push_to_registry:
+    environment: dockerhub
     name: Push Docker image to Docker Hub
     runs-on: ubuntu-latest
     if: ${{ github.event.pull_request.merged }}

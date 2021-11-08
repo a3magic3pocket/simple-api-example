@@ -4,11 +4,18 @@ import (
 	"gorm.io/gorm"
 )
 
-// CreateAllTablesIfNotExists : 테이블이 없을 시 생성(테스트 시에만 사용)
+// CreateAllTablesIfNotExists : 테이블이 없을 시 생성
 func CreateAllTablesIfNotExists(db *gorm.DB) {
+	modelAddrs := []interface{}{
+		&Locker{}, &User{},
+	}
+
 	if db != nil {
-		db.AutoMigrate(&Locker{})
-		db.AutoMigrate(&User{})
+		for _, modelAddr := range modelAddrs {
+			if !db.Migrator().HasTable(modelAddr) {
+				db.Migrator().CreateTable(modelAddr)
+			}
+		}
 	}
 }
 

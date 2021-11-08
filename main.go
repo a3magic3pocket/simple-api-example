@@ -3,6 +3,7 @@ package main
 import (
 	"os"
 	"simple-api-example/database"
+	"simple-api-example/models"
 	"simple-api-example/router"
 	"simple-api-example/utils"
 )
@@ -13,7 +14,7 @@ func main() {
 	}
 
 	database.SetDB()
-	// models.CreateAllTablesIfNotExists(database.DB)
+	models.CreateAllTablesIfNotExists(database.DB)
 	router := router.SetupRouter()
 	router.Run(":8080")
 }

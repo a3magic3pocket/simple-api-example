@@ -84,14 +84,14 @@ func UpdateLockers(c *gin.Context) {
 	}
 
 	// locker ID 유효성 검사
-	nonZeroLockers := models.Lockers{}
+	nonZeroLockerIDs := []int{}
 	for _, id := range updateLockersInput.UpdateIDs {
 		if id != 0 {
-			nonZeroLockers = append(nonZeroLockers, models.Locker{ID: id})
+			nonZeroLockerIDs = append(nonZeroLockerIDs, id)
 		}
 	}
 
-	if len(nonZeroLockers) == 0 {
+	if len(nonZeroLockerIDs) == 0 {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "all of UpdateIDs are empty"})
 		return
 	}
@@ -102,7 +102,8 @@ func UpdateLockers(c *gin.Context) {
 		return
 	}
 
-	err = nonZeroLockers.PartialUpdate(userID, updateLockersInput.Locker)
+	lockers := models.Lockers{}
+	err = lockers.PartialUpdate(userID, updateLockersInput.Locker, nonZeroLockerIDs)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error occured"})
 		return
@@ -126,14 +127,16 @@ func DeleteLockers(c *gin.Context) {
 	}
 
 	// locker ID 유효성 검사
+	lockerIDs := []int{}
 	for _, locker := range lockers {
 		if locker.ID == 0 {
 			c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "ID is empty"})
 			return
 		}
+		lockerIDs = append(lockerIDs, locker.ID)
 	}
 
-	err = lockers.DeleteLockers(userID)
+	err = lockers.DeleteLockers(userID, lockerIDs)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error occured"})
 		return

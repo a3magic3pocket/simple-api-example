@@ -13,7 +13,8 @@ import (
 
 // UserInput : 유저 인풋 구조체
 type UserInput struct {
-	models.User
+	Name     string `json:"UserName"`
+	Group    string `json:"Group"`
 	Password string `json:"Password"`
 }
 
@@ -22,6 +23,15 @@ type UserOutput struct {
 	UserName string `json:"UserName"`
 }
 
+// @Summary 유저 생성
+// @Description 유저 생성
+// @Tags user
+// @Param brand body UserInput true "UserInput"
+// @Accept  json
+// @Produce  json
+// @Router /user [post]
+// @Success 200 {object} SwagSucc
+// @Failure 400 {object} SwagFail
 // CreateUser : 유저 생성
 func CreateUser(c *gin.Context) {
 	userInput := UserInput{}
@@ -31,7 +41,10 @@ func CreateUser(c *gin.Context) {
 	}
 
 	// UserName 중복 여부 체크
-	err := userInput.User.Get(userInput.User.Name)
+	user := models.User{}
+	user.Name = userInput.Name
+	user.Group = userInput.Group
+	err := user.Get(userInput.Name)
 	if err == nil {
 		c.JSON(http.StatusUnprocessableEntity, gin.H{"error": "username is duplicated"})
 		return
@@ -45,9 +58,9 @@ func CreateUser(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Password too short."})
 		return
 	}
-	userInput.User.SecretKey = hash
+	user.SecretKey = hash
 
-	err = userInput.User.Create()
+	err = user.Create()
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error occured"})
 		return
@@ -56,6 +69,15 @@ func CreateUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": "success"})
 }
 
+// @Summary 유저 조회
+// @Description 유저 조회
+// @Tags user
+// @Accept  json
+// @Produce  json
+// @Router /user [get]
+// @Success 200 {object} SwagSuccRetrieveUser
+// @Failure 400 {object} SwagFail
+// CreateUser : 유저 생성
 //  RetrieveUser : 유저 조회
 func RetrieveUser(c *gin.Context) {
 	userID, err := auth.GetUserID(c)

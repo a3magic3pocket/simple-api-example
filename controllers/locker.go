@@ -11,6 +11,12 @@ import (
 	"gorm.io/gorm"
 )
 
+// LockerOutput : Locker 인풋 구조체
+type LockerInput struct {
+	ID       int    `json:"ID"`
+	Location string `json:"Location"`
+}
+
 // LockerOutput : Locker 아웃풋 구조체
 type LockerOutput struct {
 	ID       int    `json:"ID"`
@@ -19,10 +25,20 @@ type LockerOutput struct {
 
 // UpdateLockersInput : UpdateLockers 인풋 구조체
 type UpdateLockersInput struct {
-	models.Locker
+	LockerInput
 	UpdateIDs []int `json:"UpdateIDs"`
 }
 
+// @Summary 본인 소유의 Lockers 생성
+// @Description 본인 소유의 Lockers 생성
+// @Tags locker
+// @Param LockerInput body []LockerInput true "LockerInput"
+// @Accept  json
+// @Produce  json
+// @Router /lockers [post]
+// @Success 200 {object} SwagSucc
+// @Failure 400 {object} SwagFail
+// @Security BearerAuth
 // CreateLockers : Lockers 생성
 func CreateLockers(c *gin.Context) {
 	lockers := models.Lockers{}
@@ -75,6 +91,16 @@ func UpdateLocker(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": "success"})
 }
 
+// @Summary 본인 소유의 Lockers를 한 값으로 업데이트
+// @Description 본인 소유의 Lockers를 한 값으로 업데이트
+// @Tags locker
+// @Param UpdateLockersInput body UpdateLockersInput true "UpdateLockersInput"
+// @Accept  json
+// @Produce  json
+// @Router /lockers [patch]
+// @Success 200 {object} SwagSucc
+// @Failure 400 {object} SwagFail
+// @Security BearerAuth
 // UpdateLockers : Lockers를 한 값으로 업데이트
 func UpdateLockers(c *gin.Context) {
 	updateLockersInput := UpdateLockersInput{}
@@ -103,7 +129,9 @@ func UpdateLockers(c *gin.Context) {
 	}
 
 	lockers := models.Lockers{}
-	err = lockers.PartialUpdate(userID, updateLockersInput.Locker, nonZeroLockerIDs)
+	locker := models.Locker{}
+	locker.Location = updateLockersInput.LockerInput.Location
+	err = lockers.PartialUpdate(userID, locker, nonZeroLockerIDs)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "DB error occured"})
 		return
@@ -112,6 +140,16 @@ func UpdateLockers(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": "success"})
 }
 
+// @Summary 본인 소유의 Lockers 삭제
+// @Description 본인 소유의 Lockers 삭제
+// @Tags locker
+// @Param LockerInput body []LockerInput true "LockerInput"
+// @Accept  json
+// @Produce  json
+// @Router /lockers [delete]
+// @Success 200 {object} SwagSucc
+// @Failure 400 {object} SwagFail
+// @Security BearerAuth
 // DeleteLockers : Lockers 삭제(soft delete)
 func DeleteLockers(c *gin.Context) {
 	lockers := models.Lockers{}
@@ -178,6 +216,15 @@ func RetrieveLocker(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"data": lockerOuput})
 }
 
+// @Summary 본인 소유의 Lockers 조회
+// @Description 본인 소유의 Lockers 조회
+// @Tags locker
+// @Accept  json
+// @Produce  json
+// @Router /lockers [get]
+// @Success 200 {object} SwagSuccRetrieveLockers
+// @Failure 400 {object} SwagFail
+// @Security BearerAuth
 // RetrieveLockers : Lockers 조회
 func RetrieveLockers(c *gin.Context) {
 	userID, err := auth.GetUserID(c)

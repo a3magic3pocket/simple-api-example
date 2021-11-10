@@ -1,0 +1,279 @@
+definitions:
+  auth.UserInfo:
+    properties:
+      Password:
+        type: string
+      UserName:
+        type: string
+    type: object
+  controllers.AuthTokenResponse:
+    properties:
+      code:
+        type: integer
+      expire:
+        type: string
+      message:
+        type: string
+      token:
+        type: string
+    type: object
+  controllers.LockerInput:
+    properties:
+      ID:
+        type: integer
+      Location:
+        type: string
+    type: object
+  controllers.LockerOutput:
+    properties:
+      ID:
+        type: integer
+      Location:
+        type: string
+    type: object
+  controllers.SwagFail:
+    properties:
+      error:
+        type: string
+    type: object
+  controllers.SwagSucc:
+    properties:
+      data:
+        type: string
+    type: object
+  controllers.SwagSuccRetrieveLockers:
+    properties:
+      data:
+        items:
+          $ref: '#/definitions/controllers.LockerOutput'
+        type: array
+    type: object
+  controllers.SwagSuccRetrieveUser:
+    properties:
+      data:
+        $ref: '#/definitions/controllers.UserOutput'
+    type: object
+  controllers.UpdateLockersInput:
+    properties:
+      ID:
+        type: integer
+      Location:
+        type: string
+      UpdateIDs:
+        items:
+          type: integer
+        type: array
+    type: object
+  controllers.UserInput:
+    properties:
+      Group:
+        type: string
+      Password:
+        type: string
+      UserName:
+        type: string
+    type: object
+  controllers.UserOutput:
+    properties:
+      UserName:
+        type: string
+    type: object
+info:
+  contact: {}
+paths:
+  /lockers:
+    delete:
+      consumes:
+      - application/json
+      description: 본인 소유의 Lockers 삭제
+      parameters:
+      - description: LockerInput
+        in: body
+        name: LockerInput
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/controllers.LockerInput'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SwagSucc'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.SwagFail'
+      security:
+      - BearerAuth: []
+      summary: 본인 소유의 Lockers 삭제
+      tags:
+      - locker
+    get:
+      consumes:
+      - application/json
+      description: 본인 소유의 Lockers 조회
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SwagSuccRetrieveLockers'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.SwagFail'
+      security:
+      - BearerAuth: []
+      summary: 본인 소유의 Lockers 조회
+      tags:
+      - locker
+    patch:
+      consumes:
+      - application/json
+      description: 본인 소유의 Lockers를 한 값으로 업데이트
+      parameters:
+      - description: UpdateLockersInput
+        in: body
+        name: UpdateLockersInput
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.UpdateLockersInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SwagSucc'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.SwagFail'
+      security:
+      - BearerAuth: []
+      summary: 본인 소유의 Lockers를 한 값으로 업데이트
+      tags:
+      - locker
+    post:
+      consumes:
+      - application/json
+      description: 본인 소유의 Lockers 생성
+      parameters:
+      - description: LockerInput
+        in: body
+        name: LockerInput
+        required: true
+        schema:
+          items:
+            $ref: '#/definitions/controllers.LockerInput'
+          type: array
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SwagSucc'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.SwagFail'
+      security:
+      - BearerAuth: []
+      summary: 본인 소유의 Lockers 생성
+      tags:
+      - locker
+  /login:
+    post:
+      consumes:
+      - application/json
+      description: 요청 body에서 유저정보 획득
+      parameters:
+      - description: UserInfo
+        in: body
+        name: UserInfo
+        required: true
+        schema:
+          $ref: '#/definitions/auth.UserInfo'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.AuthTokenResponse'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.SwagFail'
+      summary: 요청 body에서 유저정보 획득
+      tags:
+      - auth
+  /logout:
+    post:
+      consumes:
+      - application/json
+      description: 로그아웃
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SwagSucc'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.SwagFail'
+      summary: 로그아웃
+      tags:
+      - auth
+  /user:
+    get:
+      consumes:
+      - application/json
+      description: 유저 조회
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SwagSuccRetrieveUser'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.SwagFail'
+      summary: 유저 조회
+      tags:
+      - user
+    post:
+      consumes:
+      - application/json
+      description: 유저 생성
+      parameters:
+      - description: UserInput
+        in: body
+        name: brand
+        required: true
+        schema:
+          $ref: '#/definitions/controllers.UserInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/controllers.SwagSucc'
+        "400":
+          description: Bad Request
+          schema:
+            $ref: '#/definitions/controllers.SwagFail'
+      summary: 유저 생성
+      tags:
+      - user
+swagger: "2.0"

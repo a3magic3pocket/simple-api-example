@@ -26,11 +26,17 @@ var TI TestInfo
 // testDB : 테스트 DB Connection
 var testDB *gorm.DB
 
+// TestUserInput : 테스트 유저 인풋
+type TestUserInput struct {
+	models.User
+	Password string `json:"Password"`
+}
+
 // TestInfo : 테스트 기본 정보 구조체
 type TestInfo struct {
 	Bearers    map[string]string
 	Server     *httptest.Server
-	UserInputs []controllers.UserInput
+	UserInputs []TestUserInput
 }
 
 // Init : 테스트 정보 초기화
@@ -84,7 +90,7 @@ func (ti *TestInfo) setTestServer() {
 
 //createTestUser : 테스트 유저 생성
 func (ti *TestInfo) createTestUsers() {
-	ti.UserInputs = []controllers.UserInput{
+	ti.UserInputs = []TestUserInput{
 		{User: models.User{Name: "normal1", Group: "normal"}, Password: "normalpassword1"},
 		{User: models.User{Name: "admin1", Group: "admin"}, Password: "adminpassword1"},
 	}

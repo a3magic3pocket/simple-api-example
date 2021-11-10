@@ -16,7 +16,16 @@ type UserInfo struct {
 	Password string `json:"Password" form:"Password"`
 }
 
-// GetUserInfoFromBody : 요청 body에서 이용하여 유저정보 획득
+// @Summary 요청 body에서 유저정보 획득
+// @Description 요청 body에서 유저정보 획득
+// @Tags auth
+// @Param UserInfo body UserInfo true "UserInfo"
+// @Accept  json
+// @Produce  json
+// @Router /login [post]
+// @Success 200 {object} controllers.AuthTokenResponse
+// @Failure 400 {object} controllers.SwagFail
+// GetUserInfoFromBody : 요청 body에서 유저정보 획득
 func GetUserInfoFromBody(c *gin.Context) (user models.User, err error) {
 	user = models.User{}
 
@@ -59,4 +68,17 @@ func GetUserID(c *gin.Context) (userID int, err error) {
 	}
 
 	return user.ID, nil
+}
+
+// @Summary 로그아웃
+// @Description 로그아웃
+// @Tags auth
+// @Accept  json
+// @Produce  json
+// @Router /logout [post]
+// @Success 200 {object} controllers.SwagSucc
+// @Failure 400 {object} controllers.SwagFail
+// Logout : 로그아웃
+func Logout(c *gin.Context) {
+
 }

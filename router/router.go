@@ -11,8 +11,12 @@ import (
 	"simple-api-example/middleware"
 	"strings"
 
+	_ "simple-api-example/docs"
+
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	ginSwagger "github.com/swaggo/gin-swagger"
+	swaggerFiles "github.com/swaggo/gin-swagger/swaggerFiles"
 )
 
 // SetupRouter : 라우터 세팅
@@ -46,6 +50,9 @@ func SetupRouter() *gin.Engine {
 	router.GET("favicon.ico", func(c *gin.Context) {
 		c.File("public/images/favicon.ico")
 	})
+
+	// swagger
+	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// 인증
 	router.POST("/login/basic", authMiddleware.LoginHandler)

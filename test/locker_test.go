@@ -307,7 +307,7 @@ func TestUpdateLockers(t *testing.T) {
 	method := "PATCH"
 
 	data := controllers.UpdateLockersInput{
-		Locker: models.Locker{ID: 1, Location: "Z"}, UpdateIDs: []int{1, 2, 3},
+		LockerInput: controllers.LockerInput{ID: 1, Location: "Z"}, UpdateIDs: []int{1, 2, 3},
 	}
 	headers := map[string]string{
 		"Authorization": "Bearer " + TI.Bearers["normal1"],
@@ -374,7 +374,7 @@ func TestUpdateLockers(t *testing.T) {
 	method = "PATCH"
 
 	data = controllers.UpdateLockersInput{
-		Locker: models.Locker{ID: 1, Location: "TTT"}, UpdateIDs: []int{99, 999, 9999},
+		LockerInput: controllers.LockerInput{ID: 1, Location: "TTT"}, UpdateIDs: []int{99, 999, 9999},
 	}
 	headers = map[string]string{
 		"Authorization": "Bearer " + TI.Bearers["normal1"],

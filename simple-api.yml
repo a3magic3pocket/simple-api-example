@@ -18,7 +18,7 @@ spec:
             claimName: sqlite3-pv-claim
       containers:
         - name: simple-api
-          image: a3magic3pocket/simple-api:0.0.5
+          image: a3magic3pocket/simple-api:0.0.6
           ports:
             - containerPort: 8080
           volumeMounts:

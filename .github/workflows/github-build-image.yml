@@ -26,7 +26,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_AUTH_TOKEN }}
 
       - run: chmod 775 ./extract-image-tag_linux_amd64 
-      - run: echo "TAG=`./extract-image-tag_linux_amd64 -f simple-api.yml -tu https://registry.hub.docker.com/v1/repositories/a3magic3pocket/simple-api/tags`" >> $GITHUB_ENV
+      - run: echo "TAG=`./extract-image-tag_linux_amd64 -f simple-api.yml -tu https://hub.docker.com/v2/namespaces/a3magic3pocket/repositories/simple-api/tags`" >> $GITHUB_ENV
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v2

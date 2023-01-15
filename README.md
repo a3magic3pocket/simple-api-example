@@ -2,7 +2,7 @@
 
 ## 설명
 
-- 간단한 로커 관리 서비스([simple locker](https://isthereanymerch.com))의 api 입니다.
+- 간단한 로커 관리 서비스([simple locker](https://www.coinlocker.link))의 api 입니다.
 
 ## 의존성 패키지 설치
 
@@ -47,7 +47,7 @@
 ## API 문서
 
 - 배포된 문서
-  - [api 문서](https://api.isthereanymerch.com/swagger/index.html)
+  - [api 문서](https://api.coinlocker.link/swagger/index.html)
 - 로컬에서 문서 보는 법
 
   - ```bash
